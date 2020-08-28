@@ -13,12 +13,16 @@ export default class JokeList extends Component {
     super(props);
 
     this.state = {
-      jokes: [],
+      jokes: JSON.parse(window.localStorage.getItem("jokes")) || [],
     };
+    this.getJokes = this.getJokes.bind(this);
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     // Load Jokes
+    if (this.state.jokes.length === 0) this.getJokes();
+  }
+  async getJokes() {
     let jokes = [];
     while (jokes.length < this.props.numJokesToGet) {
       let res = await axios.get("https://icanhazdadjoke.com/", {
@@ -28,6 +32,7 @@ export default class JokeList extends Component {
     }
 
     this.setState({ jokes: jokes });
+    window.localStorage.setItem("jokes", JSON.stringify(jokes));
   }
 
   handleVote(id, delta) {
